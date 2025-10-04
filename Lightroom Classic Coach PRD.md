@@ -23,9 +23,10 @@ The **Lightroom Classic AI Coach** is a plug-in that embeds a floating **chat wi
    - Input box + “Send” button.
 
 2. **OpenAI Integration**
-   - Calls OpenAI’s **Responses API** (`/v1/responses`).
-   - System prompt defines assistant as “Lightroom Coach”.
-   - Sends user’s question + lightweight Lightroom context (module, selection size, sample develop settings).
+   - Calls OpenAI's **Chat Completions API** (`/v1/chat/completions`) with **GPT-5-mini** model.
+   - System prompt defines assistant as "Lightroom Coach" and restricts responses to Lightroom-only topics.
+   - Sends user's question + lightweight Lightroom context (module, selection size, sample develop settings).
+   - Each request is stateless; no conversation history maintained.
 
 3. **User API Key Input**
    - On first launch, user enters their **OpenAI API key** in Plug-in Manager preferences.
@@ -33,8 +34,9 @@ The **Lightroom Classic AI Coach** is a plug-in that embeds a floating **chat wi
 
 4. **Action Handling**
    - AI replies with text guidance.
-   - If JSON action is detected (e.g., `{"action":"apply_develop_settings"}`), plug-in executes supported actions:
+   - If JSON action is detected (e.g., `{"action":"apply_develop_settings", "params":{...}}`), plug-in executes supported actions:
      - `apply_develop_settings` → adjusts exposure, contrast, etc. on selected photos.
+   - All edits are **nondestructive** and logged in Lightroom's history panel for easy rollback.
 
 ---
 
@@ -77,16 +79,17 @@ LightroomCoach.lrplugin/
 
 ### Daily Use
 1. User opens Coach window.  
-2. Types: *“How do I mask the sky only?”*  
-3. Assistant explains step-by-step.  
-4. If possible, provides JSON action (e.g., apply exposure adjustment).  
-5. Plug-in executes action and confirms.
+2. Types: *"How do I mask the sky only?"* or *"Brighten this photo by +0.5 exposure"*  
+3. Assistant explains step-by-step OR provides actionable guidance.  
+4. If applicable, includes JSON action block for automated edits.  
+5. Plug-in executes action; edit logged to history panel for rollback.
+6. Each query is independent; no conversation history between requests.
 
 ---
 
 ## 5. API Details
 **Endpoint:**  
-`POST https://api.openai.com/v1/responses`
+`POST https://api.openai.com/v1/chat/completions`
 
 **Headers:**  
 ```
@@ -97,15 +100,25 @@ Content-Type: application/json
 **Body Example:**
 ```json
 {
-  "model": "gpt-5.1-mini",
-  "input": [{"role": "user", "content": "How do I adjust white balance?"}],
-  "system": "You are Lightroom Coach, an expert on Adobe Lightroom Classic."
+  "model": "gpt-5-mini",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are Lightroom Coach, an AI assistant specialized exclusively in Adobe Lightroom Classic. Your purpose is to help users with Lightroom features, editing workflows, and to perform editing actions when requested. You MUST only respond to Lightroom-related questions. If asked about topics outside of Lightroom, politely redirect the user back to Lightroom functionality. When providing editing guidance that can be automated, include a JSON action block in your response."
+    },
+    {
+      "role": "user",
+      "content": "How do I adjust white balance?"
+    }
+  ]
 }
 ```
 
 **Response Handling:**
-- Use `data.output_text` for transcript.  
-- If response includes valid JSON block → parse and execute via `Actions.lua`.
+- Extract `choices[0].message.content` from response.  
+- Display text in transcript.
+- If response includes valid JSON block (e.g., `{"action":"apply_develop_settings", "params":{...}}`) → parse and execute via `Actions.lua`.
+- No conversation history stored; each request is stateless with fresh context.
 
 ---
 
@@ -145,7 +158,8 @@ Content-Type: application/json
 
 ### D. Performance
 - Verify UI does not freeze during API call.  
-- Transcript grows gracefully (no crashes with long chats).
+- Transcript displays current exchange (no conversation history stored).
+- Verify edits appear in history panel with proper descriptions.
 
 ---
 
@@ -167,11 +181,14 @@ Content-Type: application/json
 ## 9. Success Criteria
 - Plug-in installs cleanly in Lightroom.  
 - Users can enter their own OpenAI API key.  
-- Chat works with OpenAI API and gives accurate responses.  
-- At least one editing action (`apply_develop_settings`) works end-to-end.  
+- Chat works with OpenAI GPT-5-mini API and gives accurate Lightroom-specific responses.  
+- Assistant refuses to answer non-Lightroom questions.
+- At least one editing action (`apply_develop_settings`) works end-to-end.
+- All edits appear in history panel with proper rollback capability.  
 
 ---
 
 # Appendix
 - [Adobe Lightroom Classic SDK Guide](https://developer.adobe.com/lightroom/).  
-- [OpenAI Responses API Reference](https://platform.openai.com/docs/guides/responses).  
+- [OpenAI Chat Completions API Reference](https://platform.openai.com/docs/guides/chat-completions).
+- [OpenAI Pricing](https://openai.com/api/pricing/) - GPT-5-mini: $1.25/1M input tokens, $10.00/1M output tokens.  
