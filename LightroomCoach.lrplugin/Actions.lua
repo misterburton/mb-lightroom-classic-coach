@@ -235,7 +235,9 @@ function Actions.maybePerform(responseText)
     return nil
   end
   
-  if action.action == "apply_develop_settings" and action.params then
+  -- Normalizing action name check to handle "applydevelopsettings" vs "apply_develop_settings"
+  local actionName = action.action:lower():gsub("_", "")
+  if actionName == "applydevelopsettings" and action.params then
     LrTasks.startAsyncTask(function()
       local success = applyDevelopSettings(action.params)
       

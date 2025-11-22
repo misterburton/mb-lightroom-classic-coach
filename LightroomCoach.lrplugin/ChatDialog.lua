@@ -92,10 +92,10 @@ function ChatDialog.present()
         -- Strip JSON from display (code blocks or raw JSON objects)
         local displayText = response.text
         
-        -- Remove ```json...``` blocks (including newlines inside)
-        displayText = displayText:gsub("```json[^`]*```", "")
+        -- Remove ```json...``` blocks (handling potential unclosed blocks from truncation)
+        displayText = displayText:gsub("```json.*", "")
         -- Remove any other ``` code blocks
-        displayText = displayText:gsub("```[^`]*```", "")
+        displayText = displayText:gsub("```.*", "")
         -- Remove raw JSON objects - iterate to handle nested braces
         while displayText:find("{") do
           local oldText = displayText
@@ -195,10 +195,10 @@ function ChatDialog.present()
       f:separator { fill_horizontal = 1, margin_bottom = 5 },
       
       -- Transcript area
-      -- FIX: Reverting to edit_field with fixed large height.
-      -- Dynamic height binding FAILED because LrC edit_field does not reliably update
-      -- its height_in_lines via binding.
-      -- We use a fixed large height which is the standard SDK workaround for log windows.
+      -- FIX: Reverting to edit_field with MODERATE height.
+      -- height_in_lines = 60 forces vertical scrolling (~1000px height)
+      -- This is large enough to overflow the 400px view, but small enough
+      -- to minimize the massive empty white space issue.
       f:scrolled_view {
         width = 480,
         height = 400,
@@ -209,7 +209,7 @@ function ChatDialog.present()
         f:edit_field {
           value = LrView.bind("transcript"),
           width = 450, -- Prevent horizontal scroll
-          height_in_lines = 200, -- FIXED LARGE HEIGHT - Forces vertical scrolling
+          height_in_lines = 60, -- REDUCED from 200 to 60
           enabled = false, 
           wraps = true
         }
