@@ -2,12 +2,12 @@
 **Project:** Lightroom Classic AI Coach Plug-in  
 **Author:** misterburton  
 **Date:** 2025-10-04  
-**Version:** 1.0
+**Version:** 1.6
 
 ---
 
 ## 1. Overview
-The **Lightroom Classic AI Coach** is a plug-in that embeds a floating **chat window** directly inside Adobe Lightroom Classic. It allows users to ask questions about Lightroom features, menus, tools, and editing workflows, and get **real-time guidance** powered by the OpenAI API.
+The **Lightroom Classic AI Coach** is a plug-in that embeds a floating **chat window** directly inside Adobe Lightroom Classic. It allows users to ask questions about Lightroom features, menus, tools, and editing workflows, and get **real-time guidance** powered by the Google Gemini API.
 
 - **Primary Goal:** Provide photographers with an in-app AI assistant that helps them locate features, learn editing techniques, and optionally apply edits.  
 - **Audience:** Professional and enthusiast photographers using Lightroom Classic.  
@@ -22,14 +22,14 @@ The **Lightroom Classic AI Coach** is a plug-in that embeds a floating **chat wi
    - Displays transcript of user ↔ AI conversation.
    - Input box + “Send” button.
 
-2. **OpenAI Integration**
-   - Calls OpenAI's **Chat Completions API** (`/v1/chat/completions`) with **GPT-5-mini** model.
+2. **Gemini Integration**
+   - Calls Google's **Gemini 3 API** (`/v1beta/models/gemini-3-pro-preview:generateContent`).
    - System prompt defines assistant as "Lightroom Coach" and restricts responses to Lightroom-only topics.
    - Sends user's question + lightweight Lightroom context (module, selection size, sample develop settings).
    - Each request is stateless; no conversation history maintained.
 
 3. **User API Key Input**
-   - On first launch, user enters their **OpenAI API key** in Plug-in Manager preferences.
+   - On first launch, user enters their **Gemini API key** in Plug-in Manager preferences.
    - Key stored locally in Lightroom preferences (never hard-coded).
 
 4. **Action Handling**
@@ -53,7 +53,7 @@ The **Lightroom Classic AI Coach** is a plug-in that embeds a floating **chat wi
 - **Language:** Lua (Adobe Lightroom SDK).  
 - **Packaging:** `.lrplugin` bundle.  
 - **UI:** `LrDialogs.presentFloatingDialog()` + `LrView`.  
-- **Networking:** `LrHttp.post` for OpenAI API.  
+- **Networking:** `LrHttp.post` for Gemini API.  
 - **Persistence:** `LrPrefs.prefsForPlugin()` for API key.  
 - **Threading:** `LrTasks.startAsyncTask()` for async API calls.  
 
@@ -63,7 +63,7 @@ LightroomCoach.lrplugin/
 ├─ Info.lua             -- Plug-in metadata
 ├─ PluginInit.lua       -- Registers menu command
 ├─ ChatDialog.lua       -- Floating chat UI
-├─ OpenAI.lua           -- Handles API calls
+├─ Gemini.lua           -- Handles API calls
 ├─ Actions.lua          -- Parses/executed AI actions
 ├─ Prefs.lua            -- API key preferences UI
 └─ JSON.lua             -- Tiny JSON parser (3rd party)
@@ -74,7 +74,7 @@ LightroomCoach.lrplugin/
 ## 4. User Experience
 ### First Run
 1. Install plug-in via *File ▸ Plug-in Manager*.  
-2. Enter OpenAI API Key in Preferences.  
+2. Enter Gemini API Key in Preferences.  
 3. Menu item appears: *File ▸ Plug-in Extras ▸ Lightroom Coach…*.  
 
 ### Daily Use
@@ -89,33 +89,31 @@ LightroomCoach.lrplugin/
 
 ## 5. API Details
 **Endpoint:**  
-`POST https://api.openai.com/v1/chat/completions`
+`POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent`
 
 **Headers:**  
 ```
-Authorization: Bearer {API_KEY}
+x-goog-api-key: {API_KEY}
 Content-Type: application/json
 ```
 
 **Body Example:**
 ```json
 {
-  "model": "gpt-5-mini",
-  "messages": [
-    {
-      "role": "system",
-      "content": "You are Lightroom Coach, an AI assistant specialized exclusively in Adobe Lightroom Classic. Your purpose is to help users with Lightroom features, editing workflows, and to perform editing actions when requested. You MUST only respond to Lightroom-related questions. If asked about topics outside of Lightroom, politely redirect the user back to Lightroom functionality. When providing editing guidance that can be automated, include a JSON action block in your response."
-    },
+  "systemInstruction": {
+    "parts": [{"text": "You are Lightroom Coach..."}]
+  },
+  "contents": [
     {
       "role": "user",
-      "content": "How do I adjust white balance?"
+      "parts": [{"text": "How do I adjust white balance?"}]
     }
   ]
 }
 ```
 
 **Response Handling:**
-- Extract `choices[0].message.content` from response.  
+- Extract `candidates[0].content.parts[0].text` from response.  
 - Display text in transcript.
 - If response includes valid JSON block (e.g., `{"action":"apply_develop_settings", "params":{...}}`) → parse and execute via `Actions.lua`.
 - No conversation history stored; each request is stateless with fresh context.
@@ -180,8 +178,8 @@ Content-Type: application/json
 
 ## 9. Success Criteria
 - Plug-in installs cleanly in Lightroom.  
-- Users can enter their own OpenAI API key.  
-- Chat works with OpenAI GPT-5-mini API and gives accurate Lightroom-specific responses.  
+- Users can enter their own Gemini API key.  
+- Chat works with Gemini 3 Pro Preview API and gives accurate Lightroom-specific responses.  
 - Assistant refuses to answer non-Lightroom questions.
 - At least one editing action (`apply_develop_settings`) works end-to-end.
 - All edits appear in history panel with proper rollback capability.  
@@ -190,5 +188,5 @@ Content-Type: application/json
 
 # Appendix
 - [Adobe Lightroom Classic SDK Guide](https://developer.adobe.com/lightroom/).  
-- [OpenAI Chat Completions API Reference](https://platform.openai.com/docs/guides/chat-completions).
-- [OpenAI Pricing](https://openai.com/api/pricing/) - GPT-5-mini: $1.25/1M input tokens, $10.00/1M output tokens.  
+- [Gemini API Reference](https://ai.google.dev/api/rest).
+- [Gemini Pricing](https://ai.google.dev/pricing).  

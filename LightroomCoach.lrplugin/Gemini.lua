@@ -1,6 +1,6 @@
 --[[----------------------------------------------------------------------------
-OpenAI.lua
-Handles OpenAI API calls with system prompt and context
+Gemini.lua
+Handles Google Gemini API calls with system prompt and context
 
 © 2025 misterburton
 ------------------------------------------------------------------------------]]
@@ -10,7 +10,7 @@ local LrPrefs = import 'LrPrefs'
 local LrApplication = import 'LrApplication'
 
 local JSON = require 'JSON'
-local OpenAI = {}
+local Gemini = {}
 
 -- System prompt restricting responses to Lightroom Classic only
 local SYSTEM_PROMPT = [[You are Lightroom Classic Coach. Answer Lightroom questions and execute photo edits.
@@ -23,7 +23,7 @@ Available params: exposure, contrast, highlights, shadows, whites, blacks, clari
 For QUESTIONS (How/Where/What), give concise text answers. Only Lightroom Classic topics.]]
 
 -- Get current Lightroom context
-function OpenAI.getContext()
+function Gemini.getContext()
   local catalog = LrApplication.activeCatalog()
   local photos = catalog:getTargetPhotos()
   local moduleName = "Unknown"
@@ -40,15 +40,15 @@ function OpenAI.getContext()
   }
 end
 
--- Send question to OpenAI API
-function OpenAI.ask(question, context)
+-- Send question to Gemini API
+function Gemini.ask(question, context)
   local prefs = LrPrefs.prefsForPlugin()
-  local apiKey = prefs.openai_api_key or ""
+  local apiKey = prefs.gemini_api_key or ""
   
   if apiKey == "" then 
     return { 
       success = false, 
-      text = "No API key set. Please configure your OpenAI API key in Plug-in Manager." 
+      text = "No API key set. Please configure your Gemini API key in Plug-in Manager." 
     } 
   end
 
@@ -60,22 +60,35 @@ function OpenAI.ask(question, context)
       context.photoCount or 0)
   end
 
-  -- Build request body
+  -- Build request body for Gemini
+  -- Gemini uses 'contents' array and 'systemInstruction'
   local body = JSON.encode({
-    model = "gpt-5-mini",
-    messages = {
-      { role = "system", content = SYSTEM_PROMPT },
-      { role = "user", content = question .. contextStr }
+    systemInstruction = {
+      parts = {
+        { text = SYSTEM_PROMPT }
+      }
+    },
+    contents = {
+      {
+        role = "user",
+        parts = {
+          { text = question .. contextStr }
+        }
+      }
+    },
+    generationConfig = {
+      temperature = 0.7,
+      maxOutputTokens = 1000,
     }
   })
 
-  -- Make API call
+  -- Make API call to Gemini 3 Pro Preview
   local response, hdrs = LrHttp.post(
-    "https://api.openai.com/v1/chat/completions",
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent",
     body,
     { 
       { field = "Content-Type", value = "application/json" },
-      { field = "Authorization", value = "Bearer " .. apiKey } 
+      { field = "x-goog-api-key", value = apiKey } 
     }
   )
 
@@ -87,20 +100,37 @@ function OpenAI.ask(question, context)
   end
 
   -- Parse response
-  local decoded = JSON.decode(response)
-  if not decoded or not decoded.choices or #decoded.choices == 0 then
-    -- Try to extract error message
-    local errorMsg = "Invalid response from OpenAI API."
-    if decoded and decoded.error and decoded.error.message then
-      errorMsg = decoded.error.message
-    end
+  local success, decoded = pcall(JSON.decode, response)
+  
+  -- Error handling for Gemini format
+  if not success or not decoded then
     return { 
       success = false, 
-      text = errorMsg 
+      text = "Invalid JSON response from Gemini API." 
+    }
+  end
+  if decoded and decoded.error then
+    return { 
+      success = false, 
+      text = "Gemini API Error: " .. (decoded.error.message or "Unknown error")
     }
   end
 
-  local content = decoded.choices[1].message.content
+  if not decoded or not decoded.candidates or #decoded.candidates == 0 then
+    return { 
+      success = false, 
+      text = "Invalid response from Gemini API." 
+    }
+  end
+
+  -- Extract text from Gemini candidate
+  local content = ""
+  local candidate = decoded.candidates[1]
+  if candidate.content and candidate.content.parts then
+    for _, part in ipairs(candidate.content.parts) do
+      content = content .. (part.text or "")
+    end
+  end
 
   return { 
     success = true, 
@@ -108,5 +138,5 @@ function OpenAI.ask(question, context)
   }
 end
 
-return OpenAI
+return Gemini
 

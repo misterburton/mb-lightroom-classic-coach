@@ -14,18 +14,18 @@ return {
   sectionsForTopOfDialog = function(f, propertyTable)
     return {
       {
-        title = "OpenAI Configuration",
+        title = "Gemini Configuration",
         bind_to_object = prefs,
         
         f:row {
           spacing = f:control_spacing(),
           f:static_text { 
-            title = "OpenAI API Key:",
+            title = "Gemini API Key:",
             alignment = 'right',
             width = LrView.share 'label_width'
           },
           f:edit_field {
-            value = LrView.bind("openai_api_key"),
+            value = LrView.bind("gemini_api_key"),
             width_in_chars = 50,
             immediate = true
           }
@@ -38,7 +38,7 @@ return {
             width = LrView.share 'label_width'
           },
           f:static_text {
-            title = "Get your API key from platform.openai.com/api-keys",
+            title = "Get your API key from aistudio.google.com",
             font = "<system/small>",
             text_color = import 'LrColor'(0.5, 0.5, 0.5)
           }

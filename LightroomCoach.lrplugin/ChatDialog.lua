@@ -11,7 +11,7 @@ local LrBinding = import 'LrBinding'
 local LrFunctionContext = import 'LrFunctionContext'
 local LrTasks = import 'LrTasks'
 
-local OpenAI = require 'OpenAI'
+local Gemini = require 'Gemini'
 local Actions = require 'Actions'
 
 local ChatDialog = {}
@@ -59,8 +59,9 @@ function ChatDialog.present()
       props.userInput = ""
 
       LrTasks.startAsyncTask(function()
-        local contextData = OpenAI.getContext()
-        local response = OpenAI.ask(message, contextData)
+        -- Standard error handling via success checks in modules (cannot use pcall across yield boundaries in Lua 5.1)
+        local contextData = Gemini.getContext()
+        local response = Gemini.ask(message, contextData)
         
         if response.success then
           -- Parse and execute actions first
@@ -88,7 +89,9 @@ function ChatDialog.present()
           elseif actionResult then
             addToTranscript("assistant", "Applying settings...")
           else
-            addToTranscript("assistant", "Done.")
+            -- Parsing failed but we received *something*. Show the raw text so the user isn't confused.
+            -- Often this happens if the AI returns text that looks like JSON but failed our parser.
+            addToTranscript("assistant", "Could not identify action. Raw response:\n" .. response.text)
           end
         else
           addToTranscript("assistant", "Error: " .. response.text)

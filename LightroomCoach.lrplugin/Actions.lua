@@ -15,30 +15,116 @@ local Actions = {}
 -- Store last action for undo
 local lastAction = nil
 
--- Extract JSON from text (handles code blocks)
+-- Helper to unescape doubled-escaped strings from Gemini 3
+-- e.g. {\"action\": \"apply\"} -> {"action": "apply"}
+local function unescapeJSON(text)
+  return text:gsub('\\"', '"'):gsub('\\n', '\n')
+end
+
+-- Extract JSON from text (handles code blocks, multiline raw JSON, and escaped JSON strings)
 local function extractJSON(text)
-  -- Look for JSON in code blocks ```json ... ``` (with newlines)
-  local jsonBlock = text:match("```json\n?([^`]+)```")
-  if jsonBlock then
-    -- Trim whitespace
-    jsonBlock = jsonBlock:match("^%s*(.-)%s*$")
-    -- Unescape if needed (OpenAI sometimes returns escaped JSON)
-    jsonBlock = jsonBlock:gsub('\\"', '"')
-    local success, result = pcall(JSON.decode, jsonBlock)
-    if success and result then
-      return result
+  -- 1. Try exact decoding first (clean response)
+  local success, result = pcall(JSON.decode, text)
+  if success and result then return result end
+
+  -- 2. Try exact decoding of UNESCAPED text (Handle Gemini 3 stringified JSON)
+  -- This catches the case where the entire response is an escaped string
+  local unescaped = unescapeJSON(text)
+  success, result = pcall(JSON.decode, unescaped)
+  if success and result then return result end
+
+  -- 3. Code Block Strategy (Loop through all code blocks)
+  for jsonBlock in text:gmatch("```json\n?(.-)```") do
+    -- Try normal decode
+    success, result = pcall(JSON.decode, jsonBlock)
+    if success and result and result.action then return result end
+    
+    -- Try unescaped decode
+    success, result = pcall(JSON.decode, unescapeJSON(jsonBlock))
+    if success and result and result.action then return result end
+  end
+  
+  for jsonBlock in text:gmatch("```\n?(.-)```") do
+    success, result = pcall(JSON.decode, jsonBlock)
+    if success and result and result.action then return result end
+    
+    success, result = pcall(JSON.decode, unescapeJSON(jsonBlock))
+    if success and result and result.action then return result end
+  end
+  
+  -- 4. Raw JSON Strategy (Brute force search for valid object)
+  -- We search for the specific action pattern to isolate the correct object
+  -- "action" *: *"apply_develop_settings" (handling optional backslashes)
+  local actionPattern = 'action"[%s\\]*:[%s\\]*"apply_develop_settings"'
+  local actionStart = text:find(actionPattern)
+  
+  if actionStart then
+    -- Search backwards for the opening brace
+    local braceCount = 0
+    local startPos = nil
+    for i = actionStart, 1, -1 do
+      local char = text:sub(i, i)
+      if char == "}" then braceCount = braceCount + 1 end
+      if char == "{" then
+        if braceCount == 0 then
+          startPos = i
+          break
+        else
+          braceCount = braceCount - 1
+        end
+      end
+    end
+    
+    if startPos then
+      -- Search forward for the closing brace
+      braceCount = 0
+      local endPos = nil
+      for i = startPos, #text do
+        local char = text:sub(i, i)
+        if char == "{" and i ~= startPos then braceCount = braceCount + 1 end
+        if char == "}" then
+          if braceCount == 0 then
+            endPos = i
+            break
+          else
+            braceCount = braceCount - 1
+          end
+        end
+      end
+      
+      if endPos then
+        local jsonCand = text:sub(startPos, endPos)
+        -- Try normal decode
+        success, result = pcall(JSON.decode, jsonCand)
+        if success and result then return result end
+        
+        -- Try unescaped decode
+        success, result = pcall(JSON.decode, unescapeJSON(jsonCand))
+        if success and result then return result end
+      end
     end
   end
   
-  -- Look for raw JSON objects (greedy to capture full object)
-  local rawJSON = text:match("({.+})")
-  if rawJSON then
-    -- Unescape if needed
-    rawJSON = rawJSON:gsub('\\"', '"')
-    local success, result = pcall(JSON.decode, rawJSON)
-    if success and result then 
-      return result 
+  -- 5. Fallback: Greedy match (only if single object likely)
+  local startPos = text:find("{")
+  local endPos = nil
+  if startPos then
+    -- Find last }
+    for i = #text, startPos, -1 do
+      if text:sub(i, i) == "}" then
+        endPos = i
+        break
+      end
     end
+  end
+  
+  if startPos and endPos then
+    local rawJSON = text:sub(startPos, endPos)
+    success, result = pcall(JSON.decode, rawJSON)
+    if success and result then return result end
+    
+    success, result = pcall(JSON.decode, unescapeJSON(rawJSON))
+    if success and result then return result end
   end
   
   return nil
@@ -171,4 +257,3 @@ function Actions.maybePerform(responseText)
 end
 
 return Actions
-
