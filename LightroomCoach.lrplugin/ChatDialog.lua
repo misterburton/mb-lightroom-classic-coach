@@ -195,9 +195,10 @@ function ChatDialog.present()
       f:separator { fill_horizontal = 1, margin_bottom = 5 },
       
       -- Transcript area
-      -- FIX: Reverting to edit_field for reliable data binding.
-      -- FIX: Using a large height_in_lines (100) inside a constrained scrolled_view.
-      -- This forces the edit_field to be tall enough to hold content, triggering the scrolled_view's scrollbar.
+      -- FIX: Reverting to edit_field with fixed large height.
+      -- Dynamic height binding FAILED because LrC edit_field does not reliably update
+      -- its height_in_lines via binding.
+      -- We use a fixed large height which is the standard SDK workaround for log windows.
       f:scrolled_view {
         width = 480,
         height = 400,
@@ -207,10 +208,10 @@ function ChatDialog.present()
         
         f:edit_field {
           value = LrView.bind("transcript"),
-          width_in_chars = 50, -- Ensure generous width
-          height_in_lines = 100, -- FORCE large height to trigger scroll
-          enabled = false, -- Read-only
-          wraps = true -- Ensure text wrapping
+          width = 450, -- Prevent horizontal scroll
+          height_in_lines = 200, -- FIXED LARGE HEIGHT - Forces vertical scrolling
+          enabled = false, 
+          wraps = true
         }
       },
       
