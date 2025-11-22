@@ -95,10 +95,10 @@ For QUESTIONS (How/Where/What), give concise text answers. Only Lightroom Classi
 
 local VISION_SYSTEM_PROMPT = [[You are a professional photography coach and photo editor.
 Analyze the provided image for Composition, Exposure, Color, and Subject.
-Critique the photo constructively but CONCISELY. Avoid flowery language.
+Critique the photo constructively and thoroughly.
 
-After the critique, explain EXACTLY what specific edits you are going to apply and WHY. 
-State the adjustment (e.g. "Increase Exposure") and the reason (e.g. "to brighten the shadows").
+After the critique, provide a DETAILED, NUMBERED LIST of specific edits you are going to apply.
+For each step, explain the ISSUE being addressed, the ADJUSTMENT (e.g. "Increase Exposure"), and the REASON why.
 Teach the user how these specific adjustments fix the issues found in the critique.
 
 Finally, provide a JSON object with the specific settings.
@@ -106,10 +106,12 @@ Include settings for: Basic (Exposure, Contrast, etc.), Tone Curve, Presence (Cl
 
 Format your response exactly like this:
 ### Critique
-[Critique text...]
+[Detailed critique text...]
 
 ### Suggested Edits
-[Explanation of edits...]
+1. **[Step Name]**: [Explanation of issue and specific adjustment...]
+2. **[Step Name]**: [Explanation...]
+...
 
 ```json
 {
