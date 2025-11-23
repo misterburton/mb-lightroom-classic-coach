@@ -218,10 +218,11 @@ footer a {
     position: relative;
     overflow: hidden;
     transform: translateZ(0);
-    display: inline-block;
-    margin: 1.5rem auto;
+    display: block;
+    margin: 4rem auto 1.5rem;
     text-align: center;
     color: #ffffff;
+    width: fit-content;
 }
 
 .download-btn span {

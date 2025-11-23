@@ -135,9 +135,34 @@ function cleanupLogoGlitch() {
     }
 }
 
+// Download button click handler
+function initDownloadButton() {
+    const downloadBtn = document.querySelector('.download-btn');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => {
+            const url = downloadBtn.getAttribute('data-href');
+            if (url) {
+                window.location.href = url;
+            }
+        });
+        
+        // Also support keyboard activation
+        downloadBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const url = downloadBtn.getAttribute('data-href');
+                if (url) {
+                    window.location.href = url;
+                }
+            }
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     setDynamicYear();
     initLogoGlitch();
+    initDownloadButton();
 });
 
 // Cleanup on page unload
