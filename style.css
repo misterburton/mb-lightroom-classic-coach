@@ -40,19 +40,10 @@ body {
     color: black;
 }
 
-.adjust-spacing {
-    font-family: 'Andale Mono', monospace;
-    font-variant: small-caps;
-    font-size: 1.1rem;
-    letter-spacing: 0.1em;
-    margin: 0.5rem 0 0.1rem;
-    word-spacing: -0.4em;
-    text-align: center;
-}
-
 .tagline {
     text-align: center;
-    margin-top: 0.25rem;
+    margin-top: 0rem !important;
+    font-size: .8rem !important;
 }
 
 #app {
@@ -76,8 +67,8 @@ body {
 }
 
 .logo-icon {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 2.025rem;
+    height: 2.025rem;
     color: #ffffff;
 }
 
@@ -114,9 +105,25 @@ p {
     letter-spacing: 0.01em;
 }
 
+h1 {
+    font-family: 'Andale Mono', monospace;
+    font-variant: small-caps;
+    font-size: 1.3rem;
+    text-transform: lowercase;
+    letter-spacing: 0.1em;
+    margin: 0.6rem 0 0.4rem;
+    word-spacing: -0.4em;
+    text-align: center;
+}
+
 h2 {
-    font-size: 1.2rem;
-    font-weight: 300;
+    font-family: 'Andale Mono', monospace;
+    text-transform: lowercase;
+    font-variant: small-caps;
+    letter-spacing: 0.1em;
+    margin: 0.25rem 0 0.1rem;
+    word-spacing: -0.4em;
+    font-size: 1.5rem;
     margin: 2rem 0 1rem 0;
     color: #ffffff;
 }
