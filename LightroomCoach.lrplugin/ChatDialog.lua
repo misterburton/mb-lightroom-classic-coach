@@ -32,8 +32,22 @@ function ChatDialog.present()
     
     -- Initialize properties
     props.userInput = ""
-    props.transcript = ""
-    props.showSuggestions = true
+    
+    -- Zero-State Welcome Message (Onboarding)
+    props.transcript = [[👋 𝗜'𝗺 𝘆𝗼𝘂𝗿 𝗔𝗜 𝗘𝗱𝗶𝘁𝗶𝗻𝗴 𝗖𝗼𝗮𝗰𝗵.
+
+𝗧𝘄𝗼 𝘄𝗮𝘆𝘀 𝗜 𝗰𝗮𝗻 𝗵𝗲𝗹𝗽:
+
+1. 📸 𝗔𝗻𝗮𝗹𝘆𝘇𝗲 & 𝗖𝗼𝗮𝗰𝗵
+   Click the button above for a full critique and automated "Magic Fix".
+
+2. 💬 𝗘𝗱𝗶𝘁 𝘄𝗶𝘁𝗵 𝗪𝗼𝗿𝗱𝘀
+   Type instructions below like:
+   • "Make the sunset more vibrant"
+   • "Fix the white balance"
+   • "Give this a moody cinematic look"]]
+
+    props.showSuggestions = false -- suggestions removed
     
     -- Initialize chat history (not bound to UI, just internal state)
     local chatHistory = {}
@@ -182,7 +196,7 @@ function ChatDialog.present()
       spacing = f:label_spacing(),
       margin = 8,
       
-      -- Header with Analyze and New Chat buttons
+      -- Header with Analyze button
       f:row {
         fill_horizontal = 1,
         margin_bottom = 5,
@@ -194,10 +208,6 @@ function ChatDialog.present()
         f:push_button {
             title = "📷 Analyze & Coach",
             action = analyzePhoto
-        },
-        f:push_button {
-          title = "New Chat",
-          action = newChat
         }
       },
       
@@ -221,29 +231,6 @@ function ChatDialog.present()
           height_in_lines = 100, -- Increased to accommodate rich formatting
           enabled = false, 
           wraps = true
-        }
-      },
-      
-      -- Suggestion buttons (conditionally visible)
-      f:column {
-        visible = LrView.bind("showSuggestions"),
-        spacing = 3,
-        margin_bottom = 5,
-        f:push_button {
-          title = SUGGESTIONS[1],
-          action = function() sendMessage(SUGGESTIONS[1]) end
-        },
-        f:push_button {
-          title = SUGGESTIONS[2],
-          action = function() sendMessage(SUGGESTIONS[2]) end
-        },
-        f:push_button {
-          title = SUGGESTIONS[3],
-          action = function() sendMessage(SUGGESTIONS[3]) end
-        },
-        f:push_button {
-          title = SUGGESTIONS[4],
-          action = function() sendMessage(SUGGESTIONS[4]) end
         }
       },
       
