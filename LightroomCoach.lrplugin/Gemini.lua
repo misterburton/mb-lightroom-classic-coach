@@ -128,13 +128,14 @@ Example Layout:
 ──────────────────────────────
  🛠  𝗦𝗨𝗚𝗚𝗘𝗦𝗧𝗘𝗗 𝗘𝗗𝗜𝗧𝗦
 ──────────────────────────────
- 1️⃣  [Step Name]: [Explanation...]
+ 1️⃣  𝗕𝗼𝗹𝗱 𝗦𝘁𝗲𝗽 𝗡𝗮𝗺𝗲: [Explanation...]
 
- 2️⃣  [Step Name]: [Explanation...]
+ 2️⃣  𝗕𝗼𝗹𝗱 𝗦𝘁𝗲𝗽 𝗡𝗮𝗺𝗲: [Explanation...]
 
 After the critique, provide a DETAILED, NUMBERED LIST of specific edits.
 Explain your artistic intent. Don't just say "increase exposure," say "brighten the exposure to reveal the lost details in the shadows and create a more inviting atmosphere."
 Teach the user how these specific adjustments achieve the artistic vision.
+CRITICAL: The Step Name for each item in the list MUST use "Math Sans Bold" unicode characters, just like the headers in the Critical Issues section.
 
 End your critique with the exact phrase: "Applying these settings now..."
 
