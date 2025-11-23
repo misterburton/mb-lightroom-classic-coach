@@ -292,7 +292,7 @@ function Actions.maybePerform(responseText)
         
         local result = LrDialogs.confirm(
           "Edits Applied",
-          string.format("Applied the following settings:%s\n\nThese changes are logged in your history panel.", settingsStr),
+          string.format("Applied the following settings:%s\n\nTIP: Open your History panel and roll over each step to see how these edits work together to create the final look.", settingsStr),
           "Keep Changes",
           "Undo"
         )
