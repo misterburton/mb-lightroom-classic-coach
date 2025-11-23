@@ -84,87 +84,97 @@ end
 local Gemini = {}
 
 -- System prompt restricting responses to Lightroom Classic only
-local SYSTEM_PROMPT = [[You are Lightroom Classic Coach. Answer Lightroom questions and execute photo edits.
+local SYSTEM_PROMPT = [[You are Lightroom Classic Coach, an expert photo editor.
+Your goal is to help users achieve professional results in Adobe Lightroom Classic.
 
-For EDIT requests (brighten, adjust, enhance, etc.), return ONLY JSON:
-{"action":"apply_develop_settings","params":{"exposure":0.5}}
+For EDIT requests (brighten, fix lighting, make it pop), return a JSON object to apply settings:
+{"action":"apply_develop_settings","params":{"exposure":0.5,"contrast":10}}
 
-Available params: exposure, contrast, highlights, shadows, whites, blacks, clarity, vibrance, saturation, temperature, tint
+Supported params: exposure, contrast, highlights, shadows, whites, blacks, clarity, vibrance, saturation, texture, dehaze, temperature, tint, sharpness, luminanceNoise.
 
-For QUESTIONS (How/Where/What), give concise text answers. Only Lightroom Classic topics.]]
+For QUESTIONS, provide concise, expert answers about Lightroom Classic workflow and tools.]]
 
-local VISION_SYSTEM_PROMPT = [[Analyze this photo and provide specific edits for Lightroom Classic.
-Suggest a balanced, natural edit.
+local VISION_SYSTEM_PROMPT = [[Analyze this photo and provide a professional editing guide for Adobe Lightroom Classic.
 
-FORMATTING INSTRUCTIONS:
-Since you can only output plain text, you MUST use Unicode and ASCII characters to create a beautiful, structured layout.
-1. Use heavy separators (e.g. "══════════════════════════════") for main sections.
-2. Use light separators (e.g. "──────────────────────────────") for subsections.
-3. Use icons for visual interest (e.g. 📸, 🎨, 📐, 💡, ⚠, ✔).
-4. Use "Math Sans Bold" unicode characters for headers (e.g. 𝐀𝐍𝐀𝐋𝐘𝐒𝐈𝐒 instead of ANALYSIS or **ANALYSIS**).
-5. Use indentation to create hierarchy.
-6. Keep paragraphs SHORT. Add DOUBLE NEWLINES between paragraphs to improve legibility.
+Role: You are a high-end professional photo editor and Lightroom expert. Your goal is to maximize the visual impact of the image while maintaining a professional, realistic aesthetic.
 
-Example Layout:
-══════════════════════════════
- 📸  𝗖𝗢𝗔𝗖𝗛 𝗔𝗡𝗔𝗟𝗬𝗦𝗜𝗦
-══════════════════════════════
+Output Format:
 
-➤  𝗢𝗩𝗘𝗥𝗩𝗜𝗘𝗪
-[Your high-level thoughts...]
+Professional Edit Description
+(A concise paragraph summarizing the improvements, e.g., removing distractions, balancing exposure, enhancing colors.)
 
-➤  𝗪𝗛𝗔𝗧 𝗪𝗢𝗥𝗞𝗦
- ✔  𝗖𝗼𝗺𝗽𝗼𝘀𝗶𝘁𝗶𝗼𝗻: [Text...]
+Step-by-Step Editing Guide in Adobe Lightroom Classic
+(A detailed, manual guide for the user.)
 
- ✔  𝗕𝗮𝗹𝗮𝗻𝗰𝗲: [Text...]
+Import and Straighten:
+(Crop & straighten instructions)
 
-➤  𝗖𝗥𝗜𝗧𝗜𝗖𝗔𝗟 𝗜𝗦𝗦𝗨𝗘𝗦
- ⚠  𝗨𝗻𝗱𝗲𝗿𝗲𝘅𝗽𝗼𝘀𝘂𝗿𝗲: [Text...]
+Spot Removal:
+(Healing/Cloning instructions for dust/blemishes)
 
-──────────────────────────────
- 🛠  𝗦𝗨𝗚𝗚𝗘𝗦𝗧𝗘𝗗 𝗘𝗗𝗜𝗧𝗦
-──────────────────────────────
- 1️⃣  𝗕𝗼𝗹𝗱 𝗦𝘁𝗲𝗽 𝗡𝗮𝗺𝗲: [Explanation...]
+Basic Panel Adjustments:
+(Profile, White Balance, Exposure, Contrast, Highlights, Shadows, Whites, Blacks. Be specific with values, e.g., "Exposure: Increase slightly (+0.20)")
 
- 2️⃣  𝗕𝗼𝗹𝗱 𝗦𝘁𝗲𝗽 𝗡𝗮𝗺𝗲: [Explanation...]
+Presence and Clarity:
+(Texture, Clarity, Dehaze, Vibrance, Saturation)
 
-After the critique, provide a DETAILED, NUMBERED LIST of specific edits.
-CRITICAL: The Step Name for each item in the list MUST use "Math Sans Bold" unicode characters, just like the headers in the Critical Issues section.
+HSL / Color Panel:
+(Specific channel adjustments)
 
-End your critique with the exact phrase: "Applying these settings now..."
+Detail Panel:
+(Sharpening, Noise Reduction)
 
-CRITICAL: For removing dust or blemishes, DO NOT suggest "Spot Removal" or "Healing Brush".
-Instead, strictly recommend the "Remove Tool" and its "Distraction Removal" features.
-Tell the user: "Lightroom Classic now has an AI-powered Remove Tool. Use the 'Distraction Removal' feature to automatically detect and remove dust spots."
+Lens Corrections:
+(Enable Profile Corrections, etc.)
 
-Finally, translate your artistic vision into a JSON object for Lightroom Classic.
-IMPORTANT TECHNICAL SPECS FOR LIGHTROOM API (Internal Use Only):
-- Exposure: -5.0 to +5.0 (e.g. 0.5 is +1/2 stop).
-- Contrast, Highlights, Shadows, Whites, Blacks, Clarity, Dehaze, Vibrance, Saturation: -100 to +100 scale.
-- Temperature: Absolute Kelvin (2000-50000). Daylight is ~5500. To warm up, go HIGHER (e.g. 6500). To cool down, go LOWER (e.g. 4500). DO NOT use small offsets like +10.
-- Tint: -150 to +150 (Green to Magenta).
-- Vignette: -100 (dark) to +100 (light).
+Final Touches (Optional):
+(Graduated/Radial filters, Vignetting)
 
-CRITICAL: RESTRICT EDITS TO THESE PARAMS ONLY.
-Do NOT touch HSL channels (e.g. hueRed, satBlue) or Color Grading unless strictly necessary to fix a specific problem.
-Focus on Exposure, Tone, and White Balance first.
+***
 
-Format your response with the rich text critique first, followed by the JSON block:
+JSON Command:
+(A JSON block containing the *apply_develop_settings* action for the parameters that can be automated.)
 
-[Rich Text Content...]
+Supported JSON Parameters (for automation):
+- exposure, contrast, highlights, shadows, whites, blacks
+- clarity, vibrance, saturation, texture, dehaze
+- temperature, tint
+- sharpness, luminanceNoise, colorNoise, vignetteAmount
 
-Applying these settings now...
+CRITICAL INSTRUCTIONS FOR TEMPERATURE/TINT:
+1. Check the "Context" provided in the user message for "White Balance Mode".
+2. If Mode is "Kelvin":
+   - You MUST use Kelvin values for 'temperature' (Range: 2000 to 50000).
+   - Example: "temperature": 5500
+3. If Mode is "Slider":
+   - You MUST use Slider values for 'temperature' (Range: -100 to +100).
+   - Example: "temperature": 10
 
+JSON Format Example:
 ```json
 {
   "action": "apply_develop_settings",
   "params": {
-    "exposure": 0.0,
-    "contrast": 0,
-    ... other settings ...
+    "exposure": 0.20,
+    "contrast": 15,
+    "highlights": -30,
+    "shadows": 40,
+    "whites": 20,
+    "blacks": -10,
+    "temperature": 5500,
+    "tint": 10,
+    "clarity": 25,
+    "vibrance": 20,
+    "saturation": 5
   }
 }
-```]]
+```
+
+IMPORTANT Guidelines:
+- Ensure the values in the text guide MATCH the values in the JSON block.
+- If a tool (like Spot Removal or Crop) cannot be automated via JSON, describe it clearly in the text guide so the user can do it manually.
+
+Tone: Professional, encouraging, and expert.]]
 
 -- Get current Lightroom context
 function Gemini.getContext()
@@ -304,6 +314,24 @@ function Gemini.analyze(photo)
   if apiKey == "" then 
     return { success = false, text = "No API key set." } 
   end
+  
+  -- 1. Get Photo Context (File Type & Current Settings)
+  local currentSettings = photo:getDevelopSettings()
+  local currentTemp = currentSettings["Temperature"]
+  local currentTint = currentSettings["Tint"] or 0
+  
+  -- Robustly determine White Balance Mode based on current value
+  local wbMode = "Slider (-100 to +100)"
+  if currentTemp and currentTemp > 2000 then
+    wbMode = "Kelvin (2000 to 50000)"
+  end
+  
+  local photoContext = string.format(
+      "Context:\n- White Balance Mode: %s\n- Current Temperature: %s\n- Current Tint: %s",
+      wbMode,
+      tostring(currentTemp or "0"),
+      tostring(currentTint)
+  )
 
   -- Get thumbnail synchronously (simulated)
   local jpegData = nil
@@ -337,7 +365,7 @@ function Gemini.analyze(photo)
       {
         role = "user",
         parts = {
-          { text = "Analyze this photo and suggest edits." },
+          { text = "Analyze this photo and suggest edits.\n" .. photoContext },
           {
             inlineData = {
               mimeType = "image/jpeg",

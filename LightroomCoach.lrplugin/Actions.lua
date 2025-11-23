@@ -182,6 +182,9 @@ local function applyDevelopSettings(params)
     mappedParams[sdkKey] = value
   end
   
+  -- NO MORE SMURF GUARD. We trust the AI to provide correct units (Kelvin vs Slider)
+  -- because we now feed it the correct context (File Type & Current Settings) in Gemini.lua.
+  
   local success = false
   
   -- Group updates into logical sequence for history
@@ -190,7 +193,6 @@ local function applyDevelopSettings(params)
     -- Basics
     "Exposure2012", "Contrast2012", 
     "Highlights2012", "Shadows2012", "Whites2012", "Blacks2012",
-    "Temperature", "Tint",
     -- Presence
     "Clarity2012", "Dehaze", "Vibrance", "Saturation", "Texture",
     -- Tone Curve
