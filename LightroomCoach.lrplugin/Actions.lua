@@ -148,6 +148,55 @@ local HISTORY_NAMES = {
   ParametricShadows = "Tone Curve (Shadows)"
 }
 
+-- SMURF GUARD 2.0: The "Bridge" Function
+-- Centralized Logic to sanitize temperature values
+local function sanitizeTemperature(photo, aiValue)
+  if not aiValue then return nil end
+  
+  local currentSettings = photo:getDevelopSettings()
+  local currentTemp = currentSettings["Temperature"]
+  
+  -- If we can't read current temp, safe fallback is to do nothing or pass raw
+  if not currentTemp then return aiValue end
+  
+  -- Check: Is photo in Kelvin mode (>2000) but AI sent a weird value?
+  if currentTemp > 2000 then
+     local applyVal = aiValue
+     
+     -- CASE 1: Small Slider Value (e.g., +10, -20)
+     -- Logic: Treat as relative shift (1 unit = 20 Kelvin)
+     if math.abs(aiValue) <= 100 then
+         applyVal = currentTemp + (aiValue * 20)
+         
+     -- CASE 2: Large Negative Value (e.g., -5000)
+     -- Logic: Treat as "Subtract this much Kelvin" (AI meant "make it -5000 cooler")
+     elseif aiValue < -100 then
+         -- AI sent -5000. We subtract 5000 from current.
+         -- Wait, if AI sent -5000, adding it IS subtracting.
+         applyVal = currentTemp + aiValue 
+     
+     -- CASE 3: Large Positive Value (e.g. 5500)
+     -- Logic: Valid Kelvin. Use as is.
+     else
+         applyVal = aiValue
+     end
+     
+     -- FINAL SAFETY CLAMP
+     -- Lightroom Kelvin range is generally 2000 to 50000
+     if applyVal < 2000 then applyVal = 2000 end
+     if applyVal > 50000 then applyVal = 50000 end
+     
+     return applyVal
+  end
+  
+  -- Fallback for non-Kelvin (JPEG/TIFF slider mode)
+  -- Just clamp to slider limits (-100 to 100)
+  local sliderVal = aiValue
+  if sliderVal < -100 then sliderVal = -100 end
+  if sliderVal > 100 then sliderVal = 100 end
+  return sliderVal
+end
+
 -- Apply develop settings to selected photos
 local function applyDevelopSettings(params)
   local catalog = LrApplication.activeCatalog()
@@ -182,9 +231,6 @@ local function applyDevelopSettings(params)
     mappedParams[sdkKey] = value
   end
   
-  -- NO MORE SMURF GUARD. We trust the AI to provide correct units (Kelvin vs Slider)
-  -- because we now feed it the correct context (File Type & Current Settings) in Gemini.lua.
-  
   local success = false
   
   -- Group updates into logical sequence for history
@@ -213,6 +259,10 @@ local function applyDevelopSettings(params)
       -- Each setting gets its own transaction for history visibility
       catalog:withWriteAccessDo("AI Coach: " .. niceName, function()
         for _, p in ipairs(photos) do
+          -- Use centralized sanitizer for Temperature (even if it's not in this list yet, but it isn't)
+          if key == "Temperature" then
+             val = sanitizeTemperature(p, val)
+          end
           p:applyDevelopSettings({ [key] = val })
         end
       end)
@@ -223,19 +273,23 @@ local function applyDevelopSettings(params)
   end
 
   -- Apply remaining settings (if any were missed in the ordered list)
+  -- CRITICAL FIX: This loop was previously applying Temperature blindly if it wasn't in ORDERED_KEYS.
+  -- Now we apply the sanitize logic here too.
   for key, val in pairs(mappedParams) do
     if not processed[key] then
        local niceName = HISTORY_NAMES[key] or key
        catalog:withWriteAccessDo("AI Coach: " .. niceName, function()
          for _, p in ipairs(photos) do
-           p:applyDevelopSettings({ [key] = val })
+            local finalVal = val
+            if key == "Temperature" then
+                finalVal = sanitizeTemperature(p, val)
+            end
+            p:applyDevelopSettings({ [key] = finalVal })
          end
        end)
        success = true
     end
   end
-  
-  -- No single "AI Coach Auto-Fix" block anymore. We used individual blocks.
   
   if not success then
     LrDialogs.message("Failed", "Could not apply settings to photo.", "critical")
@@ -289,6 +343,11 @@ function Actions.maybePerform(responseText)
           -- Try to get a nice name
           local sdkKey = PARAM_MAP[key] or key
           local niceName = HISTORY_NAMES[sdkKey] or key
+          
+          -- If it was Temperature, we might have changed it, but we show what the AI *intended*
+          -- or should we show the *actual* applied value? 
+          -- We can't easily get the actual applied value back here without re-reading.
+          -- Let's just show the intent.
           settingsStr = settingsStr .. string.format("\n- %s: %s", niceName, tostring(value))
         end
         
