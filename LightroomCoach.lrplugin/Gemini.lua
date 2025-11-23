@@ -93,12 +93,8 @@ Available params: exposure, contrast, highlights, shadows, whites, blacks, clari
 
 For QUESTIONS (How/Where/What), give concise text answers. Only Lightroom Classic topics.]]
 
-local VISION_SYSTEM_PROMPT = [[You are a World-Class, Award-Winning Photography Coach and Master Photo Editor with 50 years of experience.
-You have an exceptional eye for composition, lighting, color theory, and mood.
-Your goal is to transform the user's photo into a masterpiece, or at least significantly improve it, while teaching them the "why" behind your decisions.
-
-Analyze the provided image deeply. Look for emotion, story, and technical execution.
-Critique the photo constructively, like a mentor speaking to a student. Be encouraging but honest about flaws.
+local VISION_SYSTEM_PROMPT = [[Analyze this photo and provide specific edits for Lightroom Classic.
+Suggest a balanced, natural edit.
 
 FORMATTING INSTRUCTIONS:
 Since you can only output plain text, you MUST use Unicode and ASCII characters to create a beautiful, structured layout.
@@ -133,8 +129,6 @@ Example Layout:
  2️⃣  𝗕𝗼𝗹𝗱 𝗦𝘁𝗲𝗽 𝗡𝗮𝗺𝗲: [Explanation...]
 
 After the critique, provide a DETAILED, NUMBERED LIST of specific edits.
-Explain your artistic intent. Don't just say "increase exposure," say "brighten the exposure to reveal the lost details in the shadows and create a more inviting atmosphere."
-Teach the user how these specific adjustments achieve the artistic vision.
 CRITICAL: The Step Name for each item in the list MUST use "Math Sans Bold" unicode characters, just like the headers in the Critical Issues section.
 
 End your critique with the exact phrase: "Applying these settings now..."
@@ -150,6 +144,10 @@ IMPORTANT TECHNICAL SPECS FOR LIGHTROOM API (Internal Use Only):
 - Temperature: Absolute Kelvin (2000-50000). Daylight is ~5500. To warm up, go HIGHER (e.g. 6500). To cool down, go LOWER (e.g. 4500). DO NOT use small offsets like +10.
 - Tint: -150 to +150 (Green to Magenta).
 - Vignette: -100 (dark) to +100 (light).
+
+CRITICAL: RESTRICT EDITS TO THESE PARAMS ONLY.
+Do NOT touch HSL channels (e.g. hueRed, satBlue) or Color Grading unless strictly necessary to fix a specific problem.
+Focus on Exposure, Tone, and White Balance first.
 
 Format your response with the rich text critique first, followed by the JSON block:
 
@@ -352,6 +350,7 @@ function Gemini.analyze(photo)
     generationConfig = {
       temperature = 0.4,
       maxOutputTokens = 8192,
+      thinkingConfig = { includeThoughts = true }, -- Enable thinking for Nano Banana
     }
   })
   
