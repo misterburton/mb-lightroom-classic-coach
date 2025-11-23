@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lightroom Coach</title>
+    <meta name="description" content="Your AI teaching assistant inside Lightroom.">
+        
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Lightroom Coach by @misterburton">
+    <meta property="og:description" content="Your AI teaching assistant inside Lightroom.">
+    <meta property="og:video" content="https://misterburton.com/files/logos/mbLogo.mp4">
+    <meta property="og:video:secure_url" content="https://misterburton.com/files/logos/mbLogo.mp4">
+    <meta property="og:video:type" content="video/mp4">
+    <meta property="og:video:width" content="1280">
+    <meta property="og:video:height" content="720">
+    <meta property="og:image" content="https://misterburton.com/files/logos/mbLogoAnim.gif">
+    <meta property="og:image:type" content="image/gif">
+    <meta property="og:image:width" content="200">
+    <meta property="og:image:height" content="200">
+    <meta property="og:image" content="https://markdown.misterburton.com/img/mb-logo.jpg">
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Lightroom Coach by @misterburton">
+    <meta name="twitter:description" content="Your AI teaching assistant inside Lightroom.">
+    <meta name="twitter:player" content="https://misterburton.com/files/logos/mbLogo.mp4">
+    <meta name="twitter:image" content="https://misterburton.com/files/logos/mbLogoAnim.gif">
+    <meta name="twitter:image" content="https://markdown.misterburton.com/img/mb-logo.jpg">
+    
+    <meta property="og:url" content="https://markdown.misterburton.com/">
+
+    <!-- Light mode favicon -->
+    <link rel="icon" href="favicon-light.svg" media="(prefers-color-scheme: light)">
+
+    <!-- Dark mode favicon -->
+    <link rel="icon" href="favicon-dark.svg" media="(prefers-color-scheme: dark)">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <div class="logo-header">
+            <!-- Camera Icon -->
+            <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#ffffff">
+                <path d="M8,17h8v-.55c0-.75-.37-1.35-1.1-1.79s-1.7-.66-2.9-.66-2.17.22-2.9.66-1.1,1.04-1.1,1.79v.55ZM12,13c.55,0,1.02-.2,1.41-.59s.59-.86.59-1.41-.2-1.02-.59-1.41-.86-.59-1.41-.59-1.02.2-1.41.59-.59.86-.59,1.41.2,1.02.59,1.41.86.59,1.41.59ZM4,21c-.55,0-1.02-.2-1.41-.59-.39-.39-.59-.86-.59-1.41V7c0-.55.2-1.02.59-1.41s.86-.59,1.41-.59h3.15l1.85-2h6l1.85,2h3.15c.55,0,1.02.2,1.41.59s.59.86.59,1.41v12c0,.55-.2,1.02-.59,1.41-.39.39-.86.59-1.41.59H4ZM4,19h16V7h-4.05l-1.83-2h-4.25l-1.83,2h-4.05v12Z"/>
+            </svg>
+        </div>
+        <p class="adjust-spacing">lightroom coach</p>
+        
+        <p class="tagline">Your AI teaching assistant inside Lightroom</p>
+        
+        <div class="video-container">
+            <!-- Add your Vimeo embed URL here -->
+            <iframe src="" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Lightroom Coach Demo"></iframe>
+        </div>
+        
+        <div class="content-container">
+            <p>Lightroom Classic Coach is a plugin that helps you learn photo editing while you work. Instead of applying automatic filters that hide the process, it shows you what professional editors do and explains why each adjustment improves your image.</p>
+            
+            <p>The plugin uses Google's <strong>Gemini 3</strong> and <strong>Nano Banana Pro</strong> AI models to analyze your photos and answer technical questions. When it makes edits, every change appears in your Lightroom History panel. You can step through each adjustment to see exactly which sliders moved and understand the reasoning behind them.</p>
+            
+            <div class="section">
+                <h2>How it works</h2>
+                
+                <h3>Visual analysis and coaching</h3>
+                <p>Click <strong>"Analyze & Coach"</strong> and the AI evaluates your selected photo. You'll get specific feedback on composition, exposure, and color, along with a proposed editing strategy tailored to that image.</p>
+                
+                <h3>Natural language queries</h3>
+                <p>Ask questions as you edit:</p>
+                <ul>
+                    <li><em>"How do I use the Tone Curve to fade the blacks?"</em></li>
+                    <li><em>"What is the difference between Texture and Clarity?"</em></li>
+                    <li><em>"Give this photo a cinematic, moody look."</em></li>
+                </ul>
+                
+                <h3>Transparent learning</h3>
+                <p>When the Coach adjusts your photo—brightening shadows, warming white balance, or refining contrast—it documents each step in Lightroom's History panel. You can rewind through the edits to see which parameters changed and replicate the technique on future photos.</p>
+            </div>
+            
+            <div class="section">
+                <h2>Installation</h2>
+                
+                <h3>What you need</h3>
+                <ul>
+                    <li>Adobe Lightroom Classic (v12.0 or later)</li>
+                    <li>Google Gemini API key with <strong>Pay-as-you-go billing</strong> (free tier keys don't work)</li>
+                </ul>
+                
+                <h3>Get your API key</h3>
+                <ol>
+                    <li>Go to <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a></li>
+                    <li>Set up billing and select the <strong>Pay-as-you-go</strong> plan</li>
+                    <li>Create a new API key in your paid project</li>
+                </ol>
+                
+                <h3>Install the plugin</h3>
+                <ol>
+                    <li>Download the <code>LightroomCoach.lrplugin</code> file</li>
+                    <li>Open Adobe Lightroom Classic</li>
+                    <li>Go to <strong>File > Plug-in Manager</strong></li>
+                    <li>Click <strong>Add</strong> in the bottom left</li>
+                    <li>Select the <code>LightroomCoach.lrplugin</code> folder</li>
+                </ol>
+                
+                <h3>Configure your key</h3>
+                <ol>
+                    <li>In the Plug-in Manager, select <strong>Lightroom Coach</strong> from the left panel</li>
+                    <li>Find the <strong>Gemini API Key</strong> field on the right</li>
+                    <li>Paste your Pay-as-you-go API key</li>
+                    <li>Verify the status shows "Valid"</li>
+                </ol>
+                
+                <h3>Start using it</h3>
+                <ol>
+                    <li>Select a photo in the Develop module</li>
+                    <li>Go to <strong>File > Plug-in Extras > Lightroom Coach</strong></li>
+                    <li>Ask questions or click "Analyze & Coach" to begin</li>
+                </ol>
+                
+                <div class="download-btn" role="button" tabindex="0"><span>Download Lightroom Coach</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-16" role="contentinfo">
+        <!-- Animated SVG Logo -->
+        <a href="https://misterburton.com/" target="_blank" rel="noopener noreferrer" class="logo w-[27px] h-[30px] mx-auto block" aria-label="Visit misterburton.com">
+          <svg class="svg w-full h-full block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25.8 30" role="img" aria-label="misterburton logo">
+            <title>misterburton Logo</title>
+            <defs></defs>
+            <g id="logoGroup">
+              <path class="mb-path" d="M21.9,19.5c-0.2-1.1-0.9-2-1.8-2.6c0.9-0.8,1.3-2.1,0.9-3.3c-0.8-2.6-2.6-4.8-4.5-6.9c-0.9-0.9-1.9-1.9-2.8-2.7v22.3
+                            c2.1-0.6,4.2-1.5,6-2.8C21.1,22.5,22.2,21.2,21.9,19.5z M18.2,11.8c0.5,1.1,1.5,2.4,0.6,3.7c-0.2,0.3-0.6,0.4-0.9,0.4
+                            c-0.9-0.1-1.7-0.5-2.4-1.1V8.4C16.6,9.4,17.5,10.6,18.2,11.8z M20,20c0.2,0.8-0.5,1.3-1,1.7c-1.1,0.8-2.2,1.4-3.5,1.8V17
+                            c0.9,0.3,1.7,0.6,2.5,1C18.7,18.4,19.9,19,20,20z"></path>
+              <path class="mb-path" d="M12.1,4.1v22.2l-1.8-0.9V13.5c0-0.4,0,0,0-2c0-0.1-1.2,2.9-1.7,10.1l-0.1,2.7l-1.7-1.3v-0.7c0.1-2.8,0.3-5.6,0.8-8.4L7,13.2
+                c-0.2,0.4-0.4,0.7-0.6,1.1c-0.8,2.4-1.3,4.9-1.3,7.4l-1.5-1.1c0.1-4,0.9-7.7,3.3-10.6c0.5,0.5,0.9,1.1,1.4,1.6
+                c0.3-1.1,0.6-2.1,1-3.1C9.8,6.8,10.8,5.3,12.1,4.1z"></path>
+              <path class="mb-path" d="M25.8,23.4C26,16.7,23.6,10,19.1,5c-1.7-2.1-3.8-3.8-6.2-5C9.4,1.7,6.3,5.1,4.2,8.2C1.3,12.8-0.2,18.1,0,23.4l2.7,0.6
+                c0.2,0.6,0.3,1.2,0.5,1.8l2.7,0.6l0.6,2l6.4,1.5l6.5-1.5l0.6-2l2.7-0.6l0.5-1.8L25.8,23.4z M17.9,6.2c3.8,4.6,6.2,9.7,6.3,15.8
+                l-2.3,0.5l-0.5,1.9l-2.8,0.7l-0.5,2l-5.2,1.2l-5.1-1.2l-0.5-1.9v-0.1l-2.8-0.7l-0.5-1.9L1.6,22c0-0.5,0-0.9,0-1.4
+                C2,15,4.5,10.2,8.1,5.9c1.3-1.6,3-2.9,4.8-3.9C14.8,3.1,16.5,4.5,17.9,6.2z"></path>
+            </g>
+          </svg>
+        </a>
+        <!-- dynamic © text -->
+        <p class="footer-text">© <span class="footer-year"></span> misterburton LLC. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="app.js" type="module"></script>
+</body>
+</html> 

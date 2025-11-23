@@ -1,56 +1,55 @@
 # Lightroom Classic Coach
 
-**Your AI-Powered Mentor Inside Lightroom.**
+**Your AI teaching assistant inside Lightroom**
 
-Lightroom Classic Coach is an intelligent teaching assistant that lives directly inside Adobe Lightroom Classic, designed to help you master photo editing while you work. Unlike "magic button" tools that hide the process, this plugin actively teaches you the craft.
+Lightroom Classic Coach is a plugin that helps you learn photo editing while you work. Instead of applying automatic filters that hide the process, it shows you what professional editors do and explains why each adjustment improves your image.
 
-Using Google's **Gemini 3** and **Nano Banana Pro** AI models, Lightroom Coach analyzes your photos, answers your technical questions, and executes complex edits, all while explaining the "why" behind every decision so you can learn to replicate professional results yourself.
+The plugin uses Google's **Gemini 3** and **Nano Banana Pro** AI models to analyze your photos and answer technical questions. When it makes edits, every change appears in your Lightroom History panel. You can step through each adjustment to see exactly which sliders moved and understand the reasoning behind them.
 
 ---
 
-## How It Works
+## How it works
 
-### 1. Visual Coaching & Analysis
-Click the **"Analyze & Coach"** button, and the AI "looks" at your currently selected photo. It provides a professional critique of your composition, exposure, and color balance, then formulates a custom editing strategy to maximize your image's potential.
+### Visual analysis and coaching
+Click **"Analyze & Coach"** and the AI evaluates your selected photo. You'll get specific feedback on composition, exposure, and color, along with a proposed editing strategy tailored to that image.
 
-### 2. Ask Anything
-Stuck on a specific tool? Just ask.
-> *"How do I use the Tone Curve to fade the blacks?"*
-> *"What is the difference between Texture and Clarity?"*
+### Natural language queries
+Ask questions as you edit:
+
+> *"How do I use the Tone Curve to fade the blacks?"*  
+> *"What is the difference between Texture and Clarity?"*  
 > *"Give this photo a cinematic, moody look."*
 
-### 3. Learn by Seeing
-When the Coach suggests an edit (like brightening exposure or warming the white balance), it doesn't just happen in the background. The plugin applies the settings non-destructively, and importantly, **logs every step in your Lightroom History panel**.
-
-You can roll back through the history to see exactly which sliders moved and why, turning every automated edit into a learning opportunity.
+### Transparent learning
+When the Coach adjusts your photo—brightening shadows, warming white balance, or refining contrast—it documents each step in Lightroom's History panel. You can rewind through the edits to see which parameters changed and replicate the technique on future photos.
 
 ---
 
-## Installation Guide
+## Installation
 
-### Prerequisites
-*   Adobe Lightroom Classic (v12.0 or later)
-*   A Google Gemini API Key (**Pay-as-you-go** plan required)
+### What you need
+* Adobe Lightroom Classic (v12.0 or later)
+* Google Gemini API key with **Pay-as-you-go billing** (free tier keys don't work)
 
-### Step 1: Get Your API Key
-1.  Go to [Google AI Studio](https://aistudio.google.com/app/apikey).
-2.  **Important:** You must set up billing and select the **Pay-as-you-go** plan. The free tier key is not supported.
-3.  Create a new API key in your paid project.
+### Get your API key
+1. Go to [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Set up billing and select the **Pay-as-you-go** plan
+3. Create a new API key in your paid project
 
-### Step 2: Install the Plugin
-1.  Download the `LightroomCoach.lrplugin` file.
-2.  Open **Adobe Lightroom Classic**.
-3.  Go to **File > Plug-in Manager**.
-4.  Click the **Add** button in the bottom left.
-5.  Navigate to and select the `LightroomCoach.lrplugin` folder.
+### Install the plugin
+1. Download the `LightroomCoach.lrplugin` file
+2. Open Adobe Lightroom Classic
+3. Go to **File > Plug-in Manager**
+4. Click **Add** in the bottom left
+5. Select the `LightroomCoach.lrplugin` folder
 
-### Step 3: Configure
-1.  In the Plug-in Manager, select **Lightroom Coach** from the list on the left.
-2.  Find the **Gemini API Key** section on the right.
-3.  Paste your **Pay-as-you-go** API key into the field.
-4.  Status should change to "Valid".
+### Configure your key
+1. In the Plug-in Manager, select **Lightroom Coach** from the left panel
+2. Find the **Gemini API Key** field on the right
+3. Paste your Pay-as-you-go API key
+4. Verify the status shows "Valid"
 
-### Step 4: Start Coaching
-1.  Select a photo in your Library or Develop module.
-2.  Go to **File > Plug-in Extras > Lightroom Coach...**
-3.  Start chatting using natural language or click "Analyze & Coach" for automated teaching and editing.
+### Start using it
+1. Select a photo in the Develop module
+2. Go to **File > Plug-in Extras > Lightroom Coach**
+3. Ask questions or click "Analyze & Coach" to begin
