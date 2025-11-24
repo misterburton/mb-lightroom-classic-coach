@@ -48,7 +48,7 @@ body {
 
 #app {
     width: 90%;
-    max-width: 37.5rem;
+    max-width: 50rem;
     flex: 1;
     display: flex;
     flex-direction: column;
