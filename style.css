@@ -92,6 +92,10 @@ body {
         width: 95%;
         padding: 2rem 0;
     }
+    
+    .content-container {
+        padding: 0 1rem;
+    }
 }
 
 .content-container {
