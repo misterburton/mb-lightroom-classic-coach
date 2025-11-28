@@ -22,7 +22,7 @@ local GITHUB_OWNER = "misterburton"
 local GITHUB_REPO = "mb-lightroom-coach"
 
 -- Current plugin version (update this alongside Info.lua when releasing)
-local CURRENT_VERSION = "2.2.0"
+local CURRENT_VERSION = "2.3.0"
 
 local ChatDialog = {}
 
@@ -110,18 +110,20 @@ function ChatDialog.present()
       props.canSend = true
       
       -- Zero-State Welcome Message (Onboarding)
-      props.transcript = [[👋 𝗜'𝗺 𝘆𝗼𝘂𝗿 𝗔𝗜 𝗘𝗱𝗶𝘁𝗶𝗻𝗴 𝗖𝗼𝗮𝗰𝗵.
+      props.transcript = [[👋 𝗛𝗶, 𝗜'𝗺 𝘆𝗼𝘂𝗿 𝗔𝗜 𝗧𝗲𝗮𝗰𝗵𝗶𝗻𝗴 𝗔𝘀𝘀𝗶𝘀𝘁𝗮𝗻𝘁. 🤖
 
 𝗧𝘄𝗼 𝘄𝗮𝘆𝘀 𝗜 𝗰𝗮𝗻 𝗵𝗲𝗹𝗽:
 
-1. 📸 𝗔𝗻𝗮𝗹𝘆𝘇𝗲 & 𝗖𝗼𝗮𝗰𝗵
+1. 📷 𝗔𝗻𝗮𝗹𝘆𝘇𝗲 & 𝗖𝗼𝗮𝗰𝗵
    Click the button above for a full critique and automated "Magic Fix".
 
 2. 💬 𝗘𝗱𝗶𝘁 𝘄𝗶𝘁𝗵 𝗪𝗼𝗿𝗱𝘀
    Type instructions below like:
-   • "Make the sunset more vibrant"
-   • "Fix the white balance"
-   • "Give this a moody cinematic look"]]
+
+   → 𝘏𝘰𝘸 𝘥𝘰 𝘐 𝘶𝘴𝘦 𝘵𝘩𝘦 𝘛𝘰𝘯𝘦 𝘊𝘶𝘳𝘷𝘦 𝘵𝘰 𝘧𝘢𝘥𝘦 𝘵𝘩𝘦 𝘣𝘭𝘢𝘤𝘬𝘴?
+   → 𝘍𝘪𝘹 𝘵𝘩𝘦 𝘸𝘩𝘪𝘵𝘦 𝘣𝘢𝘭𝘢𝘯𝘤𝘦
+   → 𝘞𝘩𝘢𝘵 𝘪𝘴 𝘵𝘩𝘦 𝘥𝘪𝘧𝘧𝘦𝘳𝘦𝘯𝘤𝘦 𝘣𝘦𝘵𝘸𝘦𝘦𝘯 𝘛𝘦𝘹𝘵𝘶𝘳𝘦 𝘢𝘯𝘥 𝘊𝘭𝘢𝘳𝘪𝘵𝘺?
+   → 𝘎𝘪𝘷𝘦 𝘵𝘩𝘦 𝘪𝘮𝘢𝘨𝘦 𝘢 𝘮𝘰𝘳𝘦 𝘤𝘪𝘯𝘦𝘮𝘢𝘵𝘪𝘤 𝘋𝘢𝘷𝘪𝘥 𝘍𝘪𝘯𝘤𝘩𝘦𝘳 𝘷𝘪𝘣𝘦]]
 
       props.showSuggestions = false
       
@@ -299,10 +301,6 @@ function ChatDialog.present()
         f:row {
           fill_horizontal = 1,
           margin_bottom = 5,
-          f:static_text {
-            title = "Lightroom Coach",
-            font = "<system/bold>"
-          },
           f:spacer { fill_horizontal = 1 },
           f:push_button {
               title = "📷 Analyze & Coach",
