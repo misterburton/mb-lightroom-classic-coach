@@ -386,7 +386,7 @@ code {
 
 /* Footer Styles */
 footer {
-    padding: 1rem 0 3rem 0;
+    padding: 1rem 0 calc(3rem + env(safe-area-inset-bottom, 0px)) 0;
     text-align: center;
     flex-shrink: 0;
 }
